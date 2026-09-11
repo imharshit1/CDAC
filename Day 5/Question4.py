@@ -26,22 +26,18 @@ The function should return the sorted list of dictionaries.
 import re
 from pprint import pprint
 
+def search_num(value, pattern):
+    match = re.search(pattern, value)
+    return match.group(0)
+
+
 def process_dataset(dataset):
     result = []
-    create_dict = lambda keys, values: dict(zip(keys, values))
-    keys = ["product", "price", "score"]
-    values = []
-    for record in dataset:
-        curr_price = record[1].split(": ")
-        valid_price = filter(lambda a: a <= 1000.0, float(curr_price))
-        if(not valid_price): continue
+    pattern = r"([0-9.]+)"
 
-        values.append(record[0])
-        values.append(valid_price)
-        curr_score = record[2].split(": ")
-        values.append(curr_score)
-
-        result.append(create_dict(keys, values))
+    valid_products = filter(lambda x: float(search_num(x[1], pattern)) <= 1000, dataset)
+    result = map(lambda x: dict(product = x[0], price = float(search_num(x[1], pattern)), score = float(search_num(x[2], pattern))), valid_products)
+    result = sorted(result, key = lambda x: x["score"])
 
     return result
         
